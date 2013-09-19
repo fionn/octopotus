@@ -3,7 +3,20 @@
 import tweepy
 import random
 import time
+from difflib import SequenceMatcher as seqm
 import HTMLParser
+
+def metric(a, b):
+	if "t.co" in (a and b):
+		return seqm(None, a[:-10], b[:-10]).real_quick_ratio()
+	else:
+		return 0
+
+def thesame(a, b):
+	if metric(a, b) > 0.93:
+		return True
+	else:
+		return False
 
 _htmlparser = HTMLParser.HTMLParser()
 unescape = _htmlparser.unescape
@@ -32,11 +45,18 @@ class listener(tweepy.streaming.StreamListener):
 			message = message.replace("Obama", "Octopus").replace("obama", "octopus").replace("OBAMA", "OCTOPUS")
 			if (len(message) <= 140) and ("octopus" in message.lower()) and (message != (user.status.text or unescape(user.status.text))):
 				message = unescape(message)
-				api.update_status(message)
-				print "Tweet from @" + status.user.screen_name + " at " + time.strftime("%H:%M") + ":\n", message.encode("utf8"), "\n"
+				#for tweet in api.home_timeline():		# The rate limit is much lower on this
+				for tweet in api.user_timeline(user):
+					if thesame(tweet.text, message):
+						return True
+					else:
+						continue
+				#api.update_status(message)
+				print "Tweet " + status.id_str + " from @" + status.user.screen_name + " at " + time.strftime("%H:%M") + ":\n", message.encode("utf8"), "\n"
 				t = (random.gauss(15, 4)) * 60
 				print "[Wait", int(t/60), "minutes...]\n"
-				time.sleep(t)
+				#time.sleep(t)
+				time.sleep(5)
 		return True
 
 	def on_error(self, status):
