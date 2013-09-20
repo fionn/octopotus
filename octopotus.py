@@ -31,7 +31,7 @@ class listener(tweepy.streaming.StreamListener):
 				t = (random.gauss(15, 4)) * 60
 				print "[Wait", int(t/60), "minutes...]\n"
 				time.sleep(t)
-				
+
 		return True
 
 	def on_error(self, status):
@@ -39,7 +39,7 @@ class listener(tweepy.streaming.StreamListener):
 
 def selector(tweet):
 	if ((("RT" and "@") not in tweet) and
-		("barak" not in tweet.lower())):
+		("barack" not in tweet.lower())):
 		return True
 
 def metric(a, b):
@@ -86,5 +86,14 @@ _htmlparser = HTMLParser.HTMLParser()
 unescape = _htmlparser.unescape
 
 stream = tweepy.Stream(auth, listener())
-stream.filter(track = ["obama"], languages = ["en"])
+
+while True:
+	try:
+		stream.filter(track = ["obama"], languages = ["en"])
+		break
+	except socket.error as e:
+		# fix [Errno 104] Connection reset by peer (ssl.py)
+		s = 60
+		print "Exception:", e, "\nReconnecting in", s, "seconds..."
+		time.sleep(s)
 
