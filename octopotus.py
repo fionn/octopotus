@@ -6,20 +6,65 @@ import time
 from difflib import SequenceMatcher as seqm
 import HTMLParser
 
+class listener(tweepy.streaming.StreamListener):
+	
+	def on_status(self, status):
+		if selector(status.text):
+			message = status.text
+			message = message.replace("Obama", "Octopus"). \
+							  replace("obama", "octopus"). \
+							  replace("OBAMA", "OCTOPUS")
+			
+			if validtweet(message):
+				message = unescape(message)
+				
+				if not uniquetweet(message, 0.93):
+					return True
+				
+				api.update_status(message)
+				
+				print "Tweet " + status.id_str + " from @" + \
+					  status.user.screen_name + " at " + \
+					  time.strftime("%H:%M") + \
+					  ":\n", message.encode("utf8"), "\n"
+				
+				t = (random.gauss(15, 4)) * 60
+				print "[Wait", int(t/60), "minutes...]\n"
+				time.sleep(t)
+				
+		return True
+
+	def on_error(self, status):
+		print status
+
+def selector(tweet):
+	if ((("RT" and "@") not in tweet) and
+		("barak" not in tweet.lower())):
+		return True
+
 def metric(a, b):
 	if "t.co" in (a and b):
 		return seqm(None, a[:-10], b[:-10]).real_quick_ratio()
 	else:
 		return 0
+		
+def uniquetweet(a, d):
+	for tweet in api.user_timeline(user):
+		if metric(tweet.text, a) > d:
+			return False
+		else:
+			return True
 
-def thesame(a, b):
-	if metric(a, b) > 0.93:
-		return True
-	else:
+def validtweet(tweet):
+	if len(tweet) > 140:
 		return False
+	elif "octopus" not in tweet.lower():
+		return False
+	elif tweet == (user.status.text or unescape(user.status.text)):
+		return False
+	else:
+		return True
 
-_htmlparser = HTMLParser.HTMLParser()
-unescape = _htmlparser.unescape
 
 consumer = open("consumer.txt", "r").read().splitlines()
 access = open("access.txt", "r").read().splitlines()
@@ -35,33 +80,11 @@ auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth)
 
-user = api.get_user('octopotus')
+user = api.get_user("octopotus")
 
-class listener(tweepy.streaming.StreamListener):
-	
-	def on_status(self, status):
-		if (("RT" and "@") not in status.text) and ("barack" not in status.text.lower()) and (status.user.screen_name != "octopotus"): 
-			message = status.text
-			message = message.replace("Obama", "Octopus").replace("obama", "octopus").replace("OBAMA", "OCTOPUS")
-			if (len(message) <= 140) and ("octopus" in message.lower()) and (message != (user.status.text or unescape(user.status.text))):
-				message = unescape(message)
-				#for tweet in api.home_timeline():		# The rate limit is much lower on this
-				for tweet in api.user_timeline(user):
-					if thesame(tweet.text, message):
-						return True
-					else:
-						continue
-				#api.update_status(message)
-				print "Tweet " + status.id_str + " from @" + status.user.screen_name + " at " + time.strftime("%H:%M") + ":\n", message.encode("utf8"), "\n"
-				t = (random.gauss(15, 4)) * 60
-				print "[Wait", int(t/60), "minutes...]\n"
-				#time.sleep(t)
-				time.sleep(5)
-		return True
-
-	def on_error(self, status):
-		print status
+_htmlparser = HTMLParser.HTMLParser()
+unescape = _htmlparser.unescape
 
 stream = tweepy.Stream(auth, listener())
-stream.filter(track=['obama'], languages = ["en"])
+stream.filter(track = ["obama"], languages = ["en"])
 
