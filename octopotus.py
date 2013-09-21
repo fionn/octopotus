@@ -5,6 +5,7 @@ import random
 import time
 from difflib import SequenceMatcher as seqm
 import HTMLParser
+import socket
 
 class listener(tweepy.streaming.StreamListener):
 	
