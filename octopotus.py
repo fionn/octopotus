@@ -4,7 +4,7 @@ import tweepy
 import random
 import time
 from difflib import SequenceMatcher as seqm
-import HTMLParser
+#import HTMLParser
 import logging
 import socket
 
@@ -18,21 +18,20 @@ class listener(tweepy.streaming.StreamListener):
                               replace("OBAMA", "OCTOPUS")
             
             if validtweet(message):
-                message = unescape(message)
+                #message = unescape(message)
                 
-                if not uniquetweet(message, 0.93):
-                    return True
+                if uniquetweet(message, 0.92):
+                    print "Tweet " + status.id_str + " from @" + \
+                        status.user.screen_name + " at " + \
+                        time.strftime("%H:%M") + \
+                        ":\n", message.encode("utf8"), "\n"
                 
-                print "Tweet " + status.id_str + " from @" + \
-                      status.user.screen_name + " at " + \
-                      time.strftime("%H:%M") + \
-                      ":\n", message.encode("utf8"), "\n"
-                
-                api.update_status(message)
+                    api.update_status(message)
 
-                t = (random.gauss(15, 4)) * 60
-                print "[Wait", int(t/60), "minutes...]\n"
-                time.sleep(t)
+                    t = (random.gauss(15, 4)) * 60
+                    print "[Wait", int(t / 60), "minutes...]\n"
+                    time.sleep(t)
+                    #time.sleep(3)
 
         return True
 
@@ -63,7 +62,8 @@ def uniquetweet(a, d):
 def validtweet(tweet):
     if len(tweet) > 140:
         return False
-    elif tweet == (user.status.text or unescape(user.status.text)):
+    #elif tweet == (user.status.text or unescape(user.status.text)):
+    elif tweet == user.status.text:
         return False
     else:
         return True
@@ -87,8 +87,8 @@ api = tweepy.API(auth)
 
 user = api.get_user("octopotus")
 
-_htmlparser = HTMLParser.HTMLParser()
-unescape = _htmlparser.unescape
+#_htmlparser = HTMLParser.HTMLParser()
+#unescape = _htmlparser.unescape
 
 stream = tweepy.Stream(auth, listener())
 
