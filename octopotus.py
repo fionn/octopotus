@@ -20,7 +20,7 @@ class listener(tweepy.streaming.StreamListener):
                 "from @" + status.user.screen_name,
                 "at", strftime("%Y.%m.%d %H:%M") + ":")
             print(message)
-            api.update_status(message)
+            api.update_status(status=message)
             sleep(60 * 60)
         return True
 
