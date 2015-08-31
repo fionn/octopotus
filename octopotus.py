@@ -8,7 +8,7 @@ from html import unescape
 
 auth = tweepy.OAuthHandler(creds.consumer_key, creds.consumer_secret)
 auth.set_access_token(creds.access_token, creds.access_token_secret)
-api = tweepy.API(auth)
+api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 user = api.me()
 
 class listener(tweepy.streaming.StreamListener):
@@ -19,7 +19,7 @@ class listener(tweepy.streaming.StreamListener):
                 "from @" + status.user.screen_name,
                 "at", strftime("%Y.%m.%d %H:%M") + ":")
             print(message)
-            #api.update_status(status=message)
+            api.update_status(status=message)
             sleep(60 * 60)
         return True
 
