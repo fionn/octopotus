@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # A Twitter bot that replaces the word "Obama" with the word "Octopus".
 
-import tweepy
+import tweepy # v3.3.0
 from time import sleep, strftime
 import socket
 import creds
