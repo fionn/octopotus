@@ -1,7 +1,4 @@
 *.swp
-*.txt
-*.bash
-*.log
 *.sh
 creds.py
 __pycache__
