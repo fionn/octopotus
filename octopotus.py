@@ -3,7 +3,6 @@
 
 import tweepy # v3.3.0
 from time import sleep, strftime
-import socket
 import creds
 from html import unescape
 
@@ -20,7 +19,7 @@ class listener(tweepy.streaming.StreamListener):
                 "from @" + status.user.screen_name,
                 "at", strftime("%Y.%m.%d %H:%M") + ":")
             print(message)
-            api.update_status(status=message)
+            #api.update_status(status=message)
             sleep(60 * 60)
         return True
 
