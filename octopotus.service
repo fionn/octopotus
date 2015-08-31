@@ -1,0 +1,11 @@
+# /etc/systemd/system/octopotus.service
+[Unit]
+Description=Twitter bot that replaces "Obama" with "Octopus"
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env python3 -u /path/to/octopotus/octopotus.py
+StandardOutput=syslog
+StandardError=syslog
+
