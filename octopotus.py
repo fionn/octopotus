@@ -42,12 +42,11 @@ def willtweet(tweet):
         return False
 
 while True:
-    t = 60
     try:
         stream = tweepy.Stream(auth, listener())
         stream.filter(track = ["obama"], languages = ["en"])
-        break
     except Exception as e:
+        t = 60
         print(e, "\nReconnecting in", t, "seconds...")
         sleep(t)
 
